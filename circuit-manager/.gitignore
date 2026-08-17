@@ -1,0 +1,25 @@
+# Dependencies
+nextjs/node_modules/
+nextjs/.next/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Docker volumes
+postgres_data/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo

@@ -1,0 +1,194 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 97%;
+    --foreground: 220 25% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
+    --primary: 217 91% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 92%;
+    --secondary-foreground: 220 25% 20%;
+    --muted: 220 15% 94%;
+    --muted-foreground: 220 15% 45%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 217 91% 50%;
+    --radius: 0.5rem;
+
+    /* Custom palette */
+    --panel-bg: 220 30% 14%;
+    --panel-surface: 220 28% 18%;
+    --panel-border: 220 25% 25%;
+    --breaker-on: 142 76% 36%;
+    --breaker-off: 220 15% 55%;
+    --breaker-spare: 220 15% 40%;
+    --breaker-vacant: 220 15% 30%;
+    --wire-hot: 0 84% 60%;
+    --wire-neutral: 220 15% 70%;
+    --wire-ground: 142 76% 36%;
+  }
+
+  .dark {
+    --background: 220 25% 8%;
+    --foreground: 220 15% 92%;
+    --card: 220 25% 11%;
+    --card-foreground: 220 15% 92%;
+    --popover: 220 25% 11%;
+    --popover-foreground: 220 15% 92%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 20% 18%;
+    --secondary-foreground: 220 15% 80%;
+    --muted: 220 20% 15%;
+    --muted-foreground: 220 15% 55%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 20% 20%;
+    --input: 220 20% 20%;
+    --ring: 217 91% 60%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'DM Sans', sans-serif;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  .panel-display {
+    background: hsl(var(--panel-bg));
+    border: 2px solid hsl(var(--panel-border));
+    border-radius: 8px;
+  }
+
+  .breaker-slot {
+    background: hsl(var(--panel-surface));
+    border: 1px solid hsl(var(--panel-border));
+    transition: all 0.15s ease;
+  }
+
+  .breaker-slot:hover {
+    border-color: hsl(var(--primary));
+  }
+
+  .breaker-on {
+    background: hsl(var(--panel-surface));
+    border-left: 3px solid hsl(var(--breaker-on));
+  }
+
+  .breaker-spare {
+    border-left: 3px solid hsl(var(--breaker-spare));
+    opacity: 0.6;
+  }
+
+  .breaker-vacant {
+    border-left: 3px solid hsl(var(--breaker-vacant));
+    opacity: 0.4;
+    background: transparent;
+    border-style: dashed;
+  }
+
+  .system-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: hsl(var(--accent));
+    background: hsl(38 92% 50% / 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid hsl(38 92% 50% / 0.3);
+  }
+
+  .area-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .nav-item {
+    @apply flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors;
+    @apply hover:bg-secondary hover:text-secondary-foreground;
+  }
+
+  .nav-item-active {
+    @apply bg-primary/10 text-primary;
+  }
+
+  .page-header {
+    @apply flex items-center justify-between mb-6;
+  }
+
+  .section-title {
+    @apply text-lg font-semibold text-foreground;
+  }
+
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-16 text-center;
+  }
+
+  .topology-node {
+    transition: all 0.2s ease;
+  }
+
+  .topology-node:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+
+/* Drag overlay */
+.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+.drag-over {
+  border-color: hsl(var(--primary)) !important;
+  background: hsl(var(--primary) / 0.05) !important;
+}
+
+/* Animations */
+.animate-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 4px hsl(var(--primary) / 0.3); }
+  50% { box-shadow: 0 0 12px hsl(var(--primary) / 0.6); }
+}

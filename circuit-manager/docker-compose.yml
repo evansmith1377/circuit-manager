@@ -1,0 +1,75 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: circuit_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: circuit_user
+      POSTGRES_PASSWORD: circuit_pass
+      POSTGRES_DB: circuit_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U circuit_user -d circuit_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  hasura:
+    image: hasura/graphql-engine:v2.40.0
+    container_name: circuit_hasura
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://circuit_user:circuit_pass@postgres:5432/circuit_db
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_DEV_MODE: "true"
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+      HASURA_GRAPHQL_ADMIN_SECRET: circuit_admin_secret
+      HASURA_GRAPHQL_JWT_SECRET: '{"type":"HS256","key":"circuit_jwt_secret_key_minimum_32_chars_long!"}'
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: public
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  nextjs:
+    build:
+      context: ./nextjs
+      dockerfile: Dockerfile
+    container_name: circuit_nextjs
+    restart: unless-stopped
+    depends_on:
+      hasura:
+        condition: service_healthy
+    environment:
+      NEXT_PUBLIC_HASURA_URL: http://localhost:8080/v1/graphql
+      NEXT_PUBLIC_HASURA_WS_URL: ws://localhost:8080/v1/graphql
+      HASURA_ADMIN_SECRET: circuit_admin_secret
+      HASURA_GRAPHQL_URL: http://hasura:8080/v1/graphql
+      JWT_SECRET: circuit_jwt_secret_key_minimum_32_chars_long!
+      NEXTAUTH_SECRET: nextauth_secret_key_32_chars_minimum!
+      NEXTAUTH_URL: http://localhost:3000
+      NEXT_TELEMETRY_DISABLED: "1"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nextjs/src:/app/src
+      - ./nextjs/public:/app/public
+      - nextjs_modules:/app/node_modules
+      - nextjs_next:/app/.next
+
+volumes:
+  postgres_data:
+  nextjs_modules:
+  nextjs_next:
