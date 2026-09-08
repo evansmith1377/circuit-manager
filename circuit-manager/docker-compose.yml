@@ -21,7 +21,7 @@ services:
       retries: 10
 
   hasura:
-    image: hasura/graphql-engine:v2.40.0
+    image: hasura/graphql-engine:v2.50.3
     container_name: circuit_hasura
     restart: unless-stopped
     depends_on:
